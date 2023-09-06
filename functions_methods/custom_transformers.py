@@ -11,7 +11,7 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 #librerías para crear custom transformers
 from sklearn.base import BaseEstimator, TransformerMixin
 
-#LLENADO DE NULOS
+#LLENADO/ELIMINACIÓN DE NULOS
 
 def drop_rows(df):
     '''
@@ -71,17 +71,30 @@ def onehot_X_label_y(X, y, drop = 'if_binary'):
 #CUSTOM TRANSFORMERS
 
 class CategoricalDistance(BaseEstimator, TransformerMixin):
-    pass
-    #def __init__(self, limit_short_medium):
-        #self.limit_short_medium = limit_short_medium
-    #def fit(self, X, y = None):
-        #return self
-    #def transform(self, X):
-        #if x <= 1500:
-            #return 'short'
-        #elif 1500 < x <= 3000:
-            #return 'medium'
-        #else:
-            #return 'long'
+    '''
+    Esta clase transforma la columna numérica distancia de vuelo en categórica
+    '''
+    def __init__(self, limit_short, limit_medium):
+        self.limit_short = int(limit_short)
+        self.limit_medium = int(limit_medium)
+    
+    def fit(self, X, y = None):
+        return self
+       
+    def transform(self, X):  
+        #hacemos una copia del DataFrame de entrada
+        X_copy = X.copy()
 
-#df_air_transformed['flight_distance_cat'] = df_air_transformed.flight_distance.apply(categorize_distance)
+        #creamos la columna 'flight_distance_cat' basada en la distancia de vuelo
+        X_copy['flight_distance_cat'] = 'short'
+
+        #establecemos 'short' para vuelos cortos
+        X_copy.loc[X_copy['flight_distance'] <= self.limit_short, 'flight_distance_cat'] = 'short'
+
+        #establecemos 'medium' para vuelos entre limit_short y limit_medium
+        X_copy.loc[(X_copy['flight_distance'] > self.limit_short) & (X_copy['flight_distance'] <= self.limit_medium), 'flight_distance_cat'] = 'medium'
+
+        #long para vuelos largos
+        X_copy.loc[X_copy['flight_distance'] > self.limit_medium, 'flight_distance_cat'] = 'long'
+
+        return X_copy

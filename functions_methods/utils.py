@@ -53,13 +53,13 @@ def load_data(csv_file):
         return None
 
 
-def create_test_set(df):
+def create_test_set(df, test_size):
     '''
     Antes de ampliar el EDA, esta función separa el dataframe en test y train.
     A partir de aquí, se trabaja con df_train y se guarda df_test para validación.
     '''
     #separación usando scikit learn train_test_split
-    df_train, df_test = train_test_split(df, test_size = 0.15, random_state = 42)
+    df_train, df_test = train_test_split(df, test_size = test_size, random_state = 42)
 
     #creamos una copia de train
     df_air = df_train.copy()

@@ -9,7 +9,6 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
 #librerías para crear custom transformers
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import FunctionTransformer
 
 
 #LLENADO/ELIMINACIÓN DE NULOS
@@ -36,7 +35,7 @@ class DropColumnsTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, list_cols_to_drop):
         self.list_cols_to_drop = list_cols_to_drop
 
-    def fit(self, X, y=None):
+    def fit(self, X, y = None):
         return self
 
     def transform(self, X):

@@ -53,7 +53,7 @@ def load_data(csv_file):
         return None
 
 
-def create_test_set(df, test_size):
+def separate_train_set(df, test_size):
     '''
     Antes de ampliar el EDA, esta función separa el dataframe en test y train.
     A partir de aquí, se trabaja con df_train y se guarda df_test para validación.

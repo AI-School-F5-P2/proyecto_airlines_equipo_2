@@ -3,72 +3,96 @@ import pandas as pd
 
 #librerías para imputar nulos
 from sklearn.impute import SimpleImputer
-from sklearn.impute import KNNImputer
 
 #librerías para codificar variables categóricas
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
 #librerías para crear custom transformers
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import FunctionTransformer
+
 
 #LLENADO/ELIMINACIÓN DE NULOS
 
-def drop_rows(df):
+class DropRowsTransformer(BaseEstimator, TransformerMixin):
     '''
     Elimina las filas que tienen nulos.
     '''
-    df.dropna(axis = 0, inplace = True)
-    return df
+    def __init__(self):
+        pass
+
+    def fit(self, X, y = None):
+        return self
+
+    def transform(self, X):
+        return X.dropna(axis = 0)
 
 
-def drop_columns(df, list_cols_to_drop):
+class DropColumnsTransformer(BaseEstimator, TransformerMixin):
     '''
     Recibe el dataframe y la lista de columnas que se quieren eliminar.
     Devuelve el dataframe modificado.
     '''
-    df.drop(list_cols_to_drop, axis = 1, inplace = True)
-    return df
+    def __init__(self, list_cols_to_drop):
+        self.list_cols_to_drop = list_cols_to_drop
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X.drop(self.list_cols_to_drop, axis = 1)
 
 
-def simple_imputer(df, string_strategy):
+class SimpleImputerTransformer(BaseEstimator, TransformerMixin):
     '''
     Recibe el dataframe completo y la estrategia para imputar como string.
     Devuelve el dataframe completo sin nulos numéricos aplicando
     la estrategia pasada como parámetro.
     '''
-    #instanciamos el SimpleImputer con la estrategia pasada como parámetro
-    imputer = SimpleImputer(strategy = string_strategy)
+    def __init__(self, string_strategy):
+        self.string_strategy = string_strategy
 
-    #filtramos sólo las columnas numéricas para que la strategy funcione
-    df_numeric = df.select_dtypes(include = ['number'])
+    def fit(self, X, y = None):
+        self.imputer = SimpleImputer(strategy = self.string_strategy)
+        self.imputer.fit(X.select_dtypes(include = ['number']))
+        return self
 
-    X = imputer.fit_transform(df_numeric)
-
-    #concatenamos df_numeric con las columnas no numéricas del dataframe original
-    df_no_numeric = df.select_dtypes(exclude = ['number'])
-    df_numeric = pd.DataFrame(X, columns = df_numeric.columns)
-    df = pd.concat([df_no_numeric, df_numeric], axis = 1)
-    return df
+    def transform(self, X):
+        df_numeric = X.select_dtypes(include = ['number'])
+        X_imputed = self.imputer.transform(df_numeric)
+        df_no_numeric = X.select_dtypes(exclude = ['number'])
+        df_numeric = pd.DataFrame(X_imputed, columns = df_numeric.columns)
+        return pd.concat([df_no_numeric, df_numeric], axis = 1)
 
 
 #CODIFICACIÓN DE VARIABLES CATEGÓRICAS
 
-def onehot_X_label_y(X, y, drop = 'if_binary'):
+class OneHotLabelEncoderTransformer(BaseEstimator, TransformerMixin):
     '''
     Recibe la matriz X, el vector de salida y, y el parámetro drop del OneHotEncoder().
     Devuelve la matriz X y el vector y codificados.
     '''
-    X_categorical = X.select_dtypes(include = ['object'])
-    encoder1 = OneHotEncoder(drop = drop)
-    X_encoded = encoder1.fit_transform(X_categorical)
+    def __init__(self, drop = 'if_binary'):
+        self.drop = drop
 
-    encoder2 = LabelEncoder()
-    y_encoded = encoder2.fit_transform(y)
+    def fit(self, X, y = None):
+        self.encoder1 = OneHotEncoder(drop = self.drop)
+        self.encoder1.fit(X.select_dtypes(include = ['object']))
 
-    return X_encoded, y_encoded
+        self.encoder2 = LabelEncoder()
+        self.encoder2.fit(y)
+        return self
+
+    def transform(self, X, y = None):
+        X_categorical = X.select_dtypes(include = ['object'])
+        X_encoded = self.encoder1.transform(X_categorical)
+
+        y_encoded = self.encoder2.transform(y)
+
+        return X_encoded, y_encoded
 
 
-#CUSTOM TRANSFORMERS
+#TRANSFORMACIÓN DE LA VARIABLE DISTANCIA DE VUELO
 
 class CategoricalDistance(BaseEstimator, TransformerMixin):
     '''

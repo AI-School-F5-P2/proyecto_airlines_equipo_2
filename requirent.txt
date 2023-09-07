@@ -1,9 +1,0 @@
-pandas
-seaborn
-ydata_profiling
-ipywidgets
-streamlit
-numpy
-scikit-learn
-flask
-mysql-connector-python

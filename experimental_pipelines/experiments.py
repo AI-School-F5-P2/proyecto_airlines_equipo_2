@@ -11,6 +11,12 @@ from functions_methods.custom_transformers import DropColumnsTransformer, DropRo
 from functions_methods.custom_transformers import SimpleImputerTransformer, OneHotEncoderTransformer, LabelEncoderTransformer
 from functions_methods.custom_transformers import MinMaxScalerTransformer
 
+#librerías para imputar nulos
+from sklearn.impute import SimpleImputer
+
+#librerías para codificar variables categóricas
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
+
 
 def experiment(X_train, y_train, cols_to_drop, strategy, drop_onehot, limit_short, limit_medium):
     '''
@@ -24,21 +30,24 @@ def experiment(X_train, y_train, cols_to_drop, strategy, drop_onehot, limit_shor
     onehot_encoder = OneHotEncoderTransformer(drop = drop_onehot)
     flight_categorical = CategoricalDistance(limit_short = limit_short, limit_medium = limit_medium)
     minmax = MinMaxScalerTransformer()
-    label_encoder = LabelEncoderTransformer()
+    label_encoder = LabelEncoder()
 
-    X_train.drop(X_train.columns[X_train.columns.str.contains('unnamed',case = False)],axis = 1, inplace = True)
     #creamos un pipeline con los transformadores
-    pipeline_X = ColumnTransformer([('drop_rows', drop_rows),
-                                ('drop_columns', drop_columns),
-                                ('simple_imputer', simple_imputer),
-                                ('flight_categorical', flight_categorical),
-                                ('onehot_encoder', onehot_encoder),
-                                ('minmax', minmax)], remainder = 'passthrough')
-    print(pipeline_X)
-    print(X_train.head())
-    print(y_train.head())
+    df_numeric = X_train.select_dtypes(include = ['number'])
+    num_columns = list(df_numeric)
+
+    df_categorical = X_train.select_dtypes(include = ['object'])
+    cat_columns = list(df_categorical)
+
+    num_pipeline = Pipeline([('imputer', SimpleImputer(strategy = strategy)),
+                             ('minmaxscaler', MinMaxScaler())])
+
+    full_pipeline = ColumnTransformer([('num', num_pipeline, num_columns),
+                                    ('cat', OneHotEncoder(), cat_columns)], remainder = 'passthrough')
+   
+
     #ajustar el pipeline y transformar los datos
-    X_transformed = pipeline_X.fit_transform(X_train)
+    X_transformed = full_pipeline.fit_transform(X_train)
     y_transformed = label_encoder.fit_transform(y_train)
     return X_transformed, y_transformed
 
@@ -50,6 +59,5 @@ def first_experiment(X_train, y_train):
     limit_short_1 = 1300
     limit_medium_1 = 2000
 
-    X_transformed1, y_transformed1 = experiment(X_train, y_train, cols_to_drop_1, strategy_1, drop_onehot_1, 
-                                                limit_short_1, limit_medium_1)
+    X_transformed1, y_transformed1 = experiment(X_train, y_train, cols_to_drop_1, strategy_1, drop_onehot_1, limit_short_1, limit_medium_1)
     return X_transformed1, y_transformed1

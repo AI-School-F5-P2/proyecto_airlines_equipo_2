@@ -81,7 +81,7 @@ class OneHotEncoderTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y = None):
         X_categorical = X.select_dtypes(include = ['object'])
-        X_encoded = self.encoder1.transform(X_categorical)
+        X_encoded = self.encoder.transform(X_categorical)
         print(X_encoded)
         return X_encoded.values
 

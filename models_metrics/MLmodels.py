@@ -74,7 +74,7 @@ def test_models(X_transformed, y_transformed):
     gradient_boosting = GradientBoostingClassifier()
     train_predict_test_cross(gradient_boosting, X_transformed, y_transformed)
 
-    light_gbm = LGBMClassifier()
+    light_gbm = LGBMClassifier(verbosity = 0)
     train_predict_test_cross(light_gbm, X_transformed, y_transformed)
 
     cat_boost = CatBoostClassifier()

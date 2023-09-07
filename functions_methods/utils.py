@@ -42,7 +42,7 @@ def load_data():
         name_cols = list(name_cols.values())
 
         #creación del dataframe
-        df = pd.read_csv('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/functions_methods/airlinedataset.csv', 
+        df = pd.read_csv('airline_passenger_satisfaction.csv', 
                          header = 0, names = name_cols)
         return df
     

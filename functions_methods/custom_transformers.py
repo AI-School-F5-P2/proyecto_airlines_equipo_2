@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 
 #librerías para codificar variables categóricas
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
 
 #librerías para crear custom transformers
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -24,7 +24,7 @@ class DropRowsTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        return X.dropna(axis = 0)
+        return (X.dropna(axis = 0)).values
 
 
 class DropColumnsTransformer(BaseEstimator, TransformerMixin):
@@ -39,7 +39,7 @@ class DropColumnsTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        return X.drop(self.list_cols_to_drop, axis = 1)
+        return (X.drop(self.list_cols_to_drop, axis = 1)).values
 
 
 class SimpleImputerTransformer(BaseEstimator, TransformerMixin):
@@ -61,34 +61,47 @@ class SimpleImputerTransformer(BaseEstimator, TransformerMixin):
         X_imputed = self.imputer.transform(df_numeric)
         df_no_numeric = X.select_dtypes(exclude = ['number'])
         df_numeric = pd.DataFrame(X_imputed, columns = df_numeric.columns)
-        return pd.concat([df_no_numeric, df_numeric], axis = 1)
+        return (pd.concat([df_no_numeric, df_numeric], axis = 1)).values
 
 
 #CODIFICACIÓN DE VARIABLES CATEGÓRICAS
 
-class OneHotLabelEncoderTransformer(BaseEstimator, TransformerMixin):
+class OneHotEncoderTransformer(BaseEstimator, TransformerMixin):
     '''
-    Recibe la matriz X, el vector de salida y, y el parámetro drop del OneHotEncoder().
-    Devuelve la matriz X y el vector y codificados.
+    Recibe la matriz X y el parámetro drop del OneHotEncoder().
+    Devuelve la matriz X codificada.
     '''
     def __init__(self, drop = 'if_binary'):
         self.drop = drop
 
     def fit(self, X, y = None):
-        self.encoder1 = OneHotEncoder(drop = self.drop)
-        self.encoder1.fit(X.select_dtypes(include = ['object']))
-
-        self.encoder2 = LabelEncoder()
-        self.encoder2.fit(y)
+        self.encoder = OneHotEncoder(drop = self.drop)
+        self.encoder.fit(X.select_dtypes(include = ['object']))
         return self
 
     def transform(self, X, y = None):
         X_categorical = X.select_dtypes(include = ['object'])
         X_encoded = self.encoder1.transform(X_categorical)
+        print(X_encoded)
+        return X_encoded.values
 
-        y_encoded = self.encoder2.transform(y)
 
-        return X_encoded, y_encoded
+class LabelEncoderTransformer(BaseEstimator, TransformerMixin):
+    '''
+    Recibe el vector y de salida.
+    Devuelve la variable codificada con 0 y 1.
+    '''
+    def __init__(self):
+        pass
+
+    def fit(self, y):
+        self.encoder = LabelEncoder()
+        self.encoder.fit(y)
+        return self
+
+    def transform(self, y):
+        y_encoded = self.encoder.transform(y)
+        return y_encoded.values
 
 
 #TRANSFORMACIÓN DE LA VARIABLE DISTANCIA DE VUELO
@@ -120,4 +133,24 @@ class CategoricalDistance(BaseEstimator, TransformerMixin):
         #long para vuelos largos
         X_copy.loc[X_copy['flight_distance'] > self.limit_medium, 'flight_distance_cat'] = 'long'
 
-        return X_copy
+        return X_copy.values
+
+
+class MinMaxScalerTransformer(BaseEstimator, TransformerMixin):
+    '''
+    Recibe la matriz X y opcionalmente los parámetros feature_range y clip del MinMaxScaler.
+    Devuelve la matriz X escalada.
+    '''
+    def __init__(self, feature_range = (0, 1), clip = False):
+        self.feature_range = feature_range
+        self.clip = clip
+
+    def fit(self, X, y = None):
+        self.scaler = MinMaxScaler(feature_range = self.feature_range, clip = self.clip)
+        self.scaler.fit(X.select_dtypes(include = ['number']))
+        return self
+
+    def transform(self, X, y = None):
+        X_numeric = X.select_dtypes(include = ['number'])
+        X_scaled = self.scaler.transform(X_numeric)
+        return X_scaled.values

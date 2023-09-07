@@ -4,7 +4,8 @@ import pandas as pd
 #librería para separar los sets de train y test
 from sklearn.model_selection import train_test_split
 
-def load_data(csv_file):
+
+def load_data():
     '''
     Lee los datos de un archivo csv y modifica los nombres de las columnas
     para usarlas más fácilmente.
@@ -41,11 +42,12 @@ def load_data(csv_file):
         name_cols = list(name_cols.values())
 
         #creación del dataframe
-        df = pd.read_csv(csv_file, header = 0, names = name_cols)
+        df = pd.read_csv('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/functions_methods/airlinedataset.csv', 
+                         header = 0, names = name_cols)
         return df
     
     except FileNotFoundError:
-        print(f"El archivo '{csv_file}' no se encontró.")
+        print(f"El archivo no se encontró.")
         return None
     
     except Exception as e:
@@ -53,21 +55,21 @@ def load_data(csv_file):
         return None
 
 
-def separate_train_set(df, test_size):
+def separate_train_set(df: pd.DataFrame, test_size):
     '''
     Antes de ampliar el EDA, esta función separa el dataframe en test y train.
     A partir de aquí, se trabaja con df_train y se guarda df_test para validación.
     '''
     #separación usando scikit learn train_test_split
-    df_train, df_test = train_test_split(df, test_size = test_size, random_state = 42)
+    df_to_train, df_test = train_test_split(df, test_size = test_size, random_state = 42)
 
     #creamos una copia de train
-    df_air = df_train.copy()
+    df_train = df_to_train.copy()
     
     #se guarda el test en un csv para más adelante
     df_test.to_csv('test.csv')
 
-    return df_air
+    return df_train
 
 
 def X_y_separation(df, string_y):

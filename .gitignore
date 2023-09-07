@@ -1,2 +1,6 @@
 airline_passenger_satisfaction.csv
 ariline2.ipynb
+modelo.ipynb
+__pycache__/
+.ipynb_checkpoints/
+heart2.pkl

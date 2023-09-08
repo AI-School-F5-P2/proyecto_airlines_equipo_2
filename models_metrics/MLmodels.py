@@ -43,14 +43,14 @@ def test(y_predicted, y_true):
     print(f"F1-Score: {f1}")
 
 
-def cross_validation(model, data_to_predict, y_true):
-    '''
-    Recibe el modelo, la matriz X y el vector y transformados para hacer la validación cruzada
-    Devuelve una media del 'accuracy'
-    '''
-    cross_val = cross_validate(model, data_to_predict, y_true, cv = 10, scoring = 'accuracy', error_score = 'raise')
-    acc_mean = np.mean(cross_val['test_score'])
-    print(f"Validación cruzada: {acc_mean}")
+# def cross_validation(model, data_to_predict, y_true):
+#     '''
+#     Recibe el modelo, la matriz X y el vector y transformados para hacer la validación cruzada
+#     Devuelve una media del 'accuracy'
+#     '''
+#     cross_val = cross_validate(model, data_to_predict, y_true, cv = 10, scoring = 'accuracy', error_score = 'raise')
+#     acc_mean = np.mean(cross_val['test_score'])
+#     print(f"Validación cruzada: {acc_mean}")
 
 
 def train_predict_test_cross(model, data_to_predict, y_true):
@@ -61,7 +61,7 @@ def train_predict_test_cross(model, data_to_predict, y_true):
     model.fit(data_to_predict, y_true)
     y_predicted = prediction(model, data_to_predict)
     test(y_predicted, y_true)
-    cross_validation(model, data_to_predict, y_true)
+    # cross_validation(model, data_to_predict, y_true)
 
 
 def test_models(X_transformed, y_transformed):

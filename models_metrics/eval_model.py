@@ -14,44 +14,27 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
 #función para separar el dataset en X - y
 from functions_methods.utils import load_data, X_y_separation
 
-df = load_data()
+from models_metrics.MLmodels import test
 
-X_train, y_train = X_y_separation(df, 'satisfaction')
+import pickle
 
-def transform_data(X, y_true):
 
-    cols_to_drop = ['unnamed', 'id', 'arrival_delay', 'departure_delay', 'gender', 'departure_arrival_time']
-    strategy = 'median'
-    drop_onehot = 'first'
-    limit_short = 1300
-    limit_medium = 2000
-    add_flight_cat = False
+def model_testing():
 
-    #creamos la nueva columna de distancia de vuelo categórica según el booleano add_flight_cat
-    if add_flight_cat:
-        data_to_predict = CategoricalDistance(limit_short = limit_short, limit_medium = limit_medium).transform(X)
-    else:
-        data_to_predict = X
+    test_file = load_data('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/test.csv')
+
+    X_test, y_test = X_y_separation(test_file, 'satisfaction')
+
+    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+        pipeline = pickle.load(archivo)
     
-    #creamos un pipeline con los transformadores
-    X_numeric = data_to_predict.select_dtypes(include = ['number'])
-    num_columns = list(X_numeric)
-
-    X_categorical = data_to_predict.select_dtypes(include = ['object'])
-    cat_columns = list(X_categorical)
-
-    num_pipeline = Pipeline([('imputer', SimpleImputer(strategy = strategy)),
-                             ('minmaxscaler', MinMaxScaler())])
-
-    full_pipeline = ColumnTransformer([('drop_col', 'drop', cols_to_drop),
-                                       ('num', num_pipeline, num_columns),
-                                       ('cat', OneHotEncoder(drop = drop_onehot), cat_columns)],
-                                       remainder = 'passthrough')
-   
-    #ajustamos el pipeline y transformamos los datos
-    X_transformed = full_pipeline.fit_transform(data_to_predict)
-    y_transformed = LabelEncoder().fit_transform(y_true)
+    X_test_transformed = pipeline.transform(X_test)
     
-    return X_transformed, y_transformed
+    y_test_transformed = LabelEncoder().transform(y_test)
 
+    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+        model = pickle.load(archivo)
+        
+    y_predicted = model.predict(X_test_transformed)
 
+    test(y_predicted, y_test_transformed)

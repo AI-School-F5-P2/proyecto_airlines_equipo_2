@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-def load_data():
+def load_data(path_to_data):
     '''
     Lee los datos de un archivo csv y modifica los nombres de las columnas
     para usarlas más fácilmente.
@@ -42,8 +42,7 @@ def load_data():
         name_cols = list(name_cols.values())
 
         #creación del dataframe
-        df = pd.read_csv('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/functions_methods/airlinedataset.csv', 
-                         header = 0, names = name_cols)
+        df = pd.read_csv(path_to_data, header = 0, names = name_cols)
         return df
     
     except FileNotFoundError:

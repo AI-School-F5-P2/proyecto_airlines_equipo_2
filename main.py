@@ -9,10 +9,11 @@ from sklearn.pipeline import Pipeline
 from models_metrics.MLmodels import test_models
 
 from models_metrics.catboost_tuning import model_tuning
+from models_metrics.eval_model import model_testing
 
 
 if __name__ == "__main__":
-    df = load_data()
+    df = load_data('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/functions_methods/airlinedataset.csv')
     
     df_train = separate_train_set(df, 0.15)
     
@@ -24,6 +25,7 @@ if __name__ == "__main__":
     # X_transformed2, y_transformed2 = second_experiment(X_train, y_train)
     # test_models(X_transformed2, y_transformed2)
 
+    #TRANSFORMACIONES SELECCIONADAS!!!
     X_transformed3, y_transformed3 = third_experiment(X_train, y_train)
     # test_models(X_transformed3, y_transformed3)
 
@@ -39,7 +41,9 @@ if __name__ == "__main__":
     # X_transformed7, y_transformed7 = seventh_experiment(X_train, y_train)
     # test_models(X_transformed7, y_transformed7)
 
-    model_tuning(X_transformed3, y_transformed3)
+    # model_tuning(X_transformed3, y_transformed3)
+
+    model_testing()
 
     #pipeline_final = Pipeline(steps = [('pipeline', full_pipeline), ('model', results_rs)])
     

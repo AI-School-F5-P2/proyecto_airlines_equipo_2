@@ -1,5 +1,6 @@
 #librería de manejo de datos
 import pandas as pd
+import numpy as np
 
 #librerías para imputar nulos
 from sklearn.impute import SimpleImputer
@@ -24,7 +25,7 @@ class DropRowsTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        return (X.dropna(axis = 0)).values
+        return (X.dropna(axis = 0))
 
 
 class DropColumnsTransformer(BaseEstimator, TransformerMixin):
@@ -39,7 +40,7 @@ class DropColumnsTransformer(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        return (X.drop(self.list_cols_to_drop, axis = 1)).values
+        return (X.drop(self.list_cols_to_drop, axis = 1))
 
 
 class SimpleImputerTransformer(BaseEstimator, TransformerMixin):
@@ -61,7 +62,7 @@ class SimpleImputerTransformer(BaseEstimator, TransformerMixin):
         X_imputed = self.imputer.transform(df_numeric)
         df_no_numeric = X.select_dtypes(exclude = ['number'])
         df_numeric = pd.DataFrame(X_imputed, columns = df_numeric.columns)
-        return (pd.concat([df_no_numeric, df_numeric], axis = 1)).values
+        return (pd.concat([df_no_numeric, df_numeric], axis = 1))
 
 
 #CODIFICACIÓN DE VARIABLES CATEGÓRICAS
@@ -83,7 +84,7 @@ class OneHotEncoderTransformer(BaseEstimator, TransformerMixin):
         X_categorical = X.select_dtypes(include = ['object'])
         X_encoded = self.encoder.transform(X_categorical)
         print(X_encoded)
-        return X_encoded.values
+        return X_encoded
 
 
 class LabelEncoderTransformer(BaseEstimator, TransformerMixin):
@@ -101,7 +102,7 @@ class LabelEncoderTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, y):
         y_encoded = self.encoder.transform(y)
-        return y_encoded.values
+        return y_encoded
 
 
 #TRANSFORMACIÓN DE LA VARIABLE DISTANCIA DE VUELO
@@ -118,22 +119,20 @@ class CategoricalDistance(BaseEstimator, TransformerMixin):
         return self
        
     def transform(self, X):  
-        #hacemos una copia del DataFrame de entrada
+
         X_copy = X.copy()
 
-        #creamos la columna 'flight_distance_cat' basada en la distancia de vuelo
-        X_copy['flight_distance_cat'] = 'short'
+        def categorize_distance(x):
+            if x <= self.limit_short:
+                return 'short'
+            elif self.limit_short < x <= self.limit_medium:
+                return 'medium'
+            else:
+                return 'long'
 
-        #establecemos 'short' para vuelos cortos
-        X_copy.loc[X_copy['flight_distance'] <= self.limit_short, 'flight_distance_cat'] = 'short'
-
-        #establecemos 'medium' para vuelos entre limit_short y limit_medium
-        X_copy.loc[(X_copy['flight_distance'] > self.limit_short) & (X_copy['flight_distance'] <= self.limit_medium), 'flight_distance_cat'] = 'medium'
-
-        #long para vuelos largos
-        X_copy.loc[X_copy['flight_distance'] > self.limit_medium, 'flight_distance_cat'] = 'long'
-
-        return X_copy.values
+        X_copy['flight_distance_cat'] = X_copy.flight_distance.apply(categorize_distance)
+        X_copy = X_copy.drop(columns = 'flight_distance')
+        return X_copy
 
 
 class MinMaxScalerTransformer(BaseEstimator, TransformerMixin):
@@ -153,4 +152,4 @@ class MinMaxScalerTransformer(BaseEstimator, TransformerMixin):
     def transform(self, X, y = None):
         X_numeric = X.select_dtypes(include = ['number'])
         X_scaled = self.scaler.transform(X_numeric)
-        return X_scaled.values
+        return X_scaled

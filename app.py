@@ -1,31 +1,85 @@
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+import pickle
 import streamlit as st
-import pickle 
 from sklearn.preprocessing import LabelEncoder
-from api import MySQLAPI
+from dataBase.api import MySQLAPI
+from dataBase.columns_order import Columns_order_class
 
+class SatisfactionPredictionApp:
+    def __init__(self):
+        self.api = MySQLAPI()
+        self.load_clf = pickle.load(open('vinary_models/modelo_randomForest_V1.pkl', 'rb'))
+        self.logo = 'images/airline_logo2.png'
+        self.column_order = Columns_order_class().columns_order()
 
-api = MySQLAPI()
-logo = 'airline_logo2.png'
+    def run(self):
+        st.set_page_config(page_title='App pprediccion de satisfaccion del cliente',
+                           page_icon=self.logo,
+                           layout='centered',
+                           initial_sidebar_state='auto'
+                           )
 
-st.set_page_config(page_title= 'App pprediccion de satifaccion del cliente',
-                   page_icon=logo,
-                   layout='centered',
-                   initial_sidebar_state='auto'
-                   )
+        st.title('App de prediccion de satisfaccion de los clientes en la aerolinea')
+        st.markdown('Esta aplicacion predice si un usuario esta o no esta satisfecho con el servico de la arolinea')
+        # st.sidebar.image(self.logo, width=150)
+        st.sidebar.header('Datos ingresados por el usuario')
 
-st.title('App de prediccion de satisafaccion de los clientes en la aerolinea')
-st.markdown('Esta aplicacion predice si un usuario esta o no esta satisfecho con el servico de la arolinea')
-st.sidebar.image(logo, width=150)
-st.sidebar.header('Datos ingresados por el usuario')
+        uploaded_file = st.sidebar.file_uploader('Cargue aqui su archivo csv', type=['csv'])
 
-#Archivo CSV cargado por el usuario
-uploaded_file = st.sidebar.file_uploader('Cargue aqui su archivo csv', type=['csv'])
+        # Valido si el usuario esta usando un archivo CSV o introdujo manualmente los datos.
+        if uploaded_file is not None:
+            input_df = pd.read_csv(uploaded_file)
+        else:
+            input_df = self.user_input()
 
-# Datos ingresados manualmente por el usuario
-def user_input():
+        st.subheader('datos ingresados por el usuario')
+
+        if uploaded_file is not None:
+            st.write(input_df)
+        else:
+            st.write('A la espera de que se cargue el archivo csv, Actualmente usando parametros de entrada de ejemplo (que se muestra a continuacion)')
+            st.write(input_df)
+
+        prediction, prediction_proba = self.predict(input_df)
+
+        #Colimnas de prediccion y probabilidad
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader('Prediccion')
+            st.write(prediction)
+             #cambio de color el texto de Prediccion
+            if prediction == 0:
+                st.markdown('<h1 style="color:#ff432d">Insatisfecho</h1>', unsafe_allow_html=True)
+            else:
+                st.markdown('<h1 style="color:#0070B8">Satisfecho</h1>', unsafe_allow_html=True)
+
+        with col2:
+            st.subheader('Probabilidad de Prediccion')
+            st.write(prediction_proba)
+            #cambio de color el grafico de barras
+            if prediction_proba[0][1] > 0.50:
+                colorPositivo = '#0070B8'
+            else:
+                colorPositivo = '#ff432d'
+            st.bar_chart(
+                prediction_proba,
+                color=['#DCDCDC', colorPositivo]
+            )
+
+        if st.button('Guardar'):
+            self.add_to_database(input_df, prediction[0])
+
+        st.write('')
+        st.write('')
+        st.write('')
+        
+        # Tabla de datos pasados obtenidos.
+        st.title('Datos almacenados')
+        data = self.api.obtener_datos()
+        df = pd.DataFrame(data)
+        st.write(df)
+
+    def user_input(self):
         #Creo los witgets
         st.sidebar.markdown("""Genero""")
         male = st.sidebar.checkbox("Gender_Male:", value=False)
@@ -60,11 +114,10 @@ def user_input():
         departure_delay_in_minutes = st.sidebar.slider("departure_delay_in_minutes", 0, 9999, 0)
         arrival_delay_in_minutes = st.sidebar.slider("arrival_delay_in_minutes", 0, 9999, 0)
         
-        #guardo los datos obtenidos en un diccionario
-        data = {   
-            'Age':age,
+        data_dict = {
             'Flight Distance':flight_distance,
             'Inflight wifi service': inflight_wifi_services,
+            'Age':age,
             'Departure/Arrival time convenient': departure_arrival_time,  
             'Ease of Online booking': ease_of_online_booking,
             'Gate location': gate_location,
@@ -88,89 +141,30 @@ def user_input():
             'Type of Travel_Personal Travel':travel_personal,
             'Class_Business':class_bussines,
             'Class_Eco':class_eco,
-            'Class_Eco Plus':class_eco_plus,    
+            'Class_Eco Plus':class_eco_plus,  
         }
         
-        #convertimos el diccionario a un dataframe
+        # Ordenos los nombres de las columnas en el mismo orden del dataset con el que se entreno al modelo
+        # para que no haya errores al momento de hacer la prediccion
+        data = {key: data_dict[key] for key in self.column_order}
         features = pd.DataFrame(data, index=[0])
-        # features.to_csv('datos6.csv', index=False) 
         return features
 
+    def predict(self, input_df):
+        prediction = self.load_clf.predict(input_df)
+        prediction_proba = self.load_clf.predict_proba(input_df)
+        return prediction, prediction_proba
 
-if uploaded_file is not None:
-    input_df = pd.read_csv(uploaded_file)
-else:
-    input_df = user_input()
+    def add_to_database(self, input_df, satisfaction):
+        #agrego el orente para que no se almacene el 0, ('Age': {0: 25})
+        input_df_list = input_df.to_dict(orient='records') 
+        #Creo un Nuevo valor
+        nuevo_valor = {'satisfaction': satisfaction}
+        #edito el último elemento de la lista
+        input_df_list[-1].update(nuevo_valor)
+        # envio la lista de diccionarios actualizada
+        self.api.agregar_cliente(input_df_list)
 
-
-
-st.subheader('datos ingresados por el usuario')
-
-if uploaded_file is not None:
-    st.write(input_df)
-else:
-    st.write('A la espera de que se cargue el archivo csv, Actualmente usando parametros de entrada de ejemplo (que se muestra a continuacion)')
-    st.write(input_df)
-    
-
-
-
-
-#cargamos el modelo de claificacion previamente entrenado
-load_clf = pickle.load(open('heart2.pkl', 'rb'))
-
-#aplicamos el modelo para realizar predicciones en base a los datosingresados
-prediction = load_clf.predict(input_df)
-prediction_proba = load_clf.predict_proba(input_df)
-
-
-col1, col2 = st.columns(2)
-with col1:
-    st.subheader('Prediccion')
-    st.write(prediction)
-    #cambio de color el texto
-    if prediction == 0:
-        st.markdown('<h1 style="color:#ff432d">Insatisfecho</h1>', unsafe_allow_html=True)
-    else:
-        st.markdown('<h1 style="color:#0070B8">Satisfecho</h1>', unsafe_allow_html=True)
-    
-    
-with col2:
-    st.subheader('Probabilidad de Prediccion')
-    st.write(prediction_proba)
-    #cambio de color de la barra
-    if prediction_proba[0][1] > 0.50:
-        colorPositivo = '#0070B8'
-    else:
-        colorPositivo = '#ff432d'
-    # Grafico de barra
-    st.bar_chart(
-        prediction_proba,
-        color=['#DCDCDC',colorPositivo]
-        )
-
-
-
-
-
-#Funcion para almacenar en la base de datos
-def agregar_BD():
-    input_df_list = input_df.to_dict(orient='records')#agrego el orente para que no se almacene el 0, ('Age': {0: 25}) 
-    #Creo un Nuevo valor
-    nuevo_valor = {'satisfaction': prediction[0]}
-    #último diccionario de la lista y agreg0 las claves y valores del nuevo diccionario
-    input_df_list[-1].update(nuevo_valor)
-    # envio la lista de diccionarios actualizada
-    api.agregar_cliente(input_df_list)
-    
-    
-
-#Boton de guargar los datos
-st.button('Guardar',  on_click=agregar_BD())
-  
-
-# Tabla de datos pasados obtenidos.
-st.title('Datos pasados almacenados')
-data = api.obtener_datos()
-df = pd.DataFrame(data)
-st.write(df)
+if __name__ == "__main__":
+    app = SatisfactionPredictionApp()
+    app.run()

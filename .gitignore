@@ -4,3 +4,5 @@ modelo.ipynb
 __pycache__/
 .ipynb_checkpoints/
 heart2.pkl
+.env
+vinary_models/

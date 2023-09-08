@@ -18,8 +18,6 @@ from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
 #función para separar el dataset en X - y
 from functions_methods.utils import X_y_separation
 
-import pickle
-
 
 def experiment(X_train, y_train, cols_to_drop, strategy, drop_onehot, limit_short, limit_medium, add_flight_cat):
     '''

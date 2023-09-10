@@ -8,16 +8,20 @@ from PIL import Image
 
 from models_metrics.eval_model import load_data_to_predict
 
+from config.models import ModelDataClients
+from config.database import Session
+
 class SatisfactionPredictionApp:
+    '''
+    Creación de la app con Streamlit. Para visualizar usar el comando: streamlit run main.py
+    '''
     def __init__(self):
-        # self.api = MySQLAPI()
         with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
             self.pipeline = pickle.load(archivo)
         
         with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
             self.model = pickle.load(archivo)
         
-        # self.column_order = Columns_order_class().columns_order()
         self.logo_path = 'C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/images/airline_logo2.png'
 
 
@@ -79,12 +83,6 @@ class SatisfactionPredictionApp:
         if st.button('Guardar'):
             self.add_to_database(input_df, prediction[0])
 
-        # Tabla de datos pasados obtenidos.
-        st.title('Datos almacenados')
-        data = self.api.obtener_datos()
-        df = pd.DataFrame(data)
-        st.write(df)
-
 
     def prediction(self, X_transformed):
         prediction = self.model.predict(X_transformed)
@@ -98,6 +96,9 @@ class SatisfactionPredictionApp:
 
     def user_input(self):
         #creamos los witgets
+        st.sidebar.markdown("""Número de seguimiento (id)""")
+        id = st.sidebar.text_input("id", "00000")
+
         st.sidebar.markdown("""Género""")
         gender = st.sidebar.radio("Gender", ['Female', 'Male'])
         
@@ -146,13 +147,13 @@ class SatisfactionPredictionApp:
         
         arrival_delay = st.sidebar.slider("Arrival Delay in Minutes", 0, 9999, 0)
 
-        data_dic = {'unnamed': 8,
-                    'id': 14926,
+        data_dic = {'unnamed': 0,
+                    'id': id,
                     'gender': gender,
                     'customer_type': customer_type,
                     'age': age,
                     'type_travel': type_travel,
-                    'class': clase,
+                    'clase': clase,
                     'flight_distance': flight_distance,
                     'wifi_service': wifi_service,
                     'departure_arrival_time': departure_arrival_time,
@@ -183,11 +184,29 @@ class SatisfactionPredictionApp:
         Esta función guarda la información ingresada 
         en una base de datos SQL junto con la predicción.
         '''
-        #agrego el orente para que no se almacene el 0, ('Age': {0: 25})
-        input_df_list = input_df.to_dict(orient='records') 
-        #Creo un Nuevo valor
-        nuevo_valor = {'satisfaction': satisfaction}
-        #edito el último elemento de la lista
-        input_df_list[-1].update(nuevo_valor)
-        # envio la lista de diccionarios actualizada
-        self.api.agregar_cliente(input_df_list)
+        #agregamos el orient para que no se almacene el 0, ('Age': {0: 25})
+        input_df_dict = input_df.to_dict(orient = 'records')
+
+        #anexamos la predicción de los datos ingresados por el usuario
+        for record in input_df_dict:
+            record['satisfaction'] = satisfaction
+
+        try:
+            #creamos una sesión de SQLAlchemy
+            db = Session()
+
+            #insertamos los registros en la base de datos
+            for record in input_df_dict:
+                new_data = ModelDataClients(**record)
+                db.add(new_data)
+
+            #confirmamos la acción realizada en la base de datos
+            db.commit()
+            print('Datos almacenados correctamente')
+            st.title('¡Datos almacenados correctamente en la base de datos!')
+        
+        except Exception as e:
+            print(f'Error al almacenar datos en la base de datos: {str(e)}')
+        
+        finally:
+            db.close()

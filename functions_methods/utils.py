@@ -18,7 +18,7 @@ def load_data(path_to_data):
                      'Customer Type': 'customer_type',
                      'Age': 'age',
                      'Type of Travel': 'type_travel',
-                     'Class': 'class',
+                     'Class': 'clase',
                      'Flight Distance': 'flight_distance',
                      'Inflight wifi service': 'wifi_service',
                      'Departure/Arrival time convenient': 'departure_arrival_time',

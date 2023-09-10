@@ -19,32 +19,34 @@ if __name__ == "__main__":
     
     X_train, y_train = X_y_separation(df_train, 'satisfaction')
     
-    # X_transformed1, y_transformed1 = first_experiment(X_train, y_train)
-    # test_models(X_transformed1, y_transformed1)
-
-    # X_transformed2, y_transformed2 = second_experiment(X_train, y_train)
-    # test_models(X_transformed2, y_transformed2)
-
     #TRANSFORMACIONES SELECCIONADAS!!!
-    X_transformed3, y_transformed3 = third_experiment(X_train, y_train)
-    # test_models(X_transformed3, y_transformed3)
+    X_transformed3 = third_experiment(X_train, y_train)
+    test_models(X_transformed3, y_train)
 
-    # X_transformed4, y_transformed4 = fourth_experiment(X_train, y_train)
-    # test_models(X_transformed4, y_transformed4)
 
-    # X_transformed5, y_transformed5 = fifth_experiment(X_train, y_train)
-    # test_models(X_transformed5, y_transformed5)
 
-    # X_transformed6, y_transformed6 = sixth_experiment(X_train, y_train)
-    # test_models(X_transformed6, y_transformed6)
+    X_transformed1 = first_experiment(X_train, y_train)
+    test_models(X_transformed1, y_train)
 
-    # X_transformed7, y_transformed7 = seventh_experiment(X_train, y_train)
-    # test_models(X_transformed7, y_transformed7)
+    X_transformed2 = second_experiment(X_train, y_train)
+    test_models(X_transformed2, y_train)
 
-    # model_tuning(X_transformed3, y_transformed3)
+    X_transformed4 = fourth_experiment(X_train, y_train)
+    test_models(X_transformed4, y_train)
 
-    model_testing()
+    X_transformed5 = fifth_experiment(X_train, y_train)
+    test_models(X_transformed5, y_train)
 
+    # X_transformed6 = sixth_experiment(X_train, y_train)
+    # test_models(X_transformed6, y_train)
+
+    X_transformed7 = seventh_experiment(X_train, y_train)
+    test_models(X_transformed7, y_train)
+    
     #pipeline_final = Pipeline(steps = [('pipeline', full_pipeline), ('model', results_rs)])
     
     #pipeline_final.fit(X_transformed3, y_transformed3)
+
+    model_tuning(X_transformed3, y_train)
+
+    model_testing()

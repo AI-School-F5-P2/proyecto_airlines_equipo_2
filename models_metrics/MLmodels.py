@@ -31,9 +31,9 @@ def test(y_predicted, y_true):
     '''
     acc = accuracy_score(y_true, y_predicted)
     conf_matrix = confusion_matrix(y_true, y_predicted)
-    precision = precision_score(y_true, y_predicted)
-    recall = recall_score(y_true, y_predicted)
-    f1 = f1_score(y_true, y_predicted)
+    precision = precision_score(y_true, y_predicted, pos_label = 'satisfied')
+    recall = recall_score(y_true, y_predicted, pos_label = 'satisfied')
+    f1 = f1_score(y_true, y_predicted, pos_label = 'satisfied')
     
     print(f"Exactitud (Accuracy): {acc}")
     print("Matriz de Confusión:")

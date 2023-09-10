@@ -49,7 +49,6 @@ def experiment(X_train, y_train, cols_to_drop, strategy, drop_onehot, limit_shor
    
     #ajustamos el pipeline y transformamos los datos
     X_transformed = full_pipeline.fit_transform(X_train_add)
-    print(y_train)
     return X_transformed, full_pipeline
 
 def first_experiment(X_train, y_train):

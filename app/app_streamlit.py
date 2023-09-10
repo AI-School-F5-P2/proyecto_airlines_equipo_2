@@ -2,6 +2,7 @@ import pandas as pd
 import pickle
 import streamlit as st
 import uuid
+from PIL import Image
 # from dataBase.api import MySQLAPI
 # from dataBase.columns_order import Columns_order_class
 
@@ -10,23 +11,30 @@ from models_metrics.eval_model import load_data_to_predict
 class SatisfactionPredictionApp:
     def __init__(self):
         # self.api = MySQLAPI()
-        self.pipeline = pickle.load(open('pipeline.pkl', 'rb'))
-        self.model = pickle.load(open('catboost_airplanes.pkl', 'rb'))
-        self.logo = 'images/airline_logo2.png'
+        with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+            self.pipeline = pickle.load(archivo)
+        
+        with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+            self.model = pickle.load(archivo)
+        
         # self.column_order = Columns_order_class().columns_order()
+        self.logo_path = 'C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/images/airline_logo2.png'
+
 
     def run(self):
         st.set_page_config(page_title = 'App Predicción de Satisfacción del Cliente',
-                           page_icon = self.logo,
                            layout = 'centered',
                            initial_sidebar_state = 'auto')
 
-        st.title('App de Predicción de Satisfacción de los Clientes en la Aerolínea')
-        st.markdown('Esta aplicación predice si un usuario está o no está satisfecho con el servicio de la arolínea')
-        # st.sidebar.image(self.logo, width=150)
-        st.sidebar.header('Datos ingresados por el usuario')
+        st.title('Predicción de Satisfacción de los Clientes en la Aerolínea')
+        st.markdown('Esta aplicación predice si un usuario está o no está satisfecho con el servicio de la aerolínea.')
+        
+        with Image.open(self.logo_path) as img:
+            st.sidebar.image(img, width = 260)
 
-        uploaded_file = st.sidebar.file_uploader('Cargue aquí su archivo csv', type = ['csv'])
+        st.sidebar.header('Datos ingresados por el usuario:')
+
+        uploaded_file = st.sidebar.file_uploader('Cargue aquí su archivo csv:', type = ['csv'])
 
         # Valido si el usuario está usando un archivo CSV o introdujo manualmente los datos.
         if uploaded_file is not None:
@@ -34,12 +42,12 @@ class SatisfactionPredictionApp:
         else:
             input_df = self.user_input()
 
-        st.subheader('Datos ingresados por el usuario')
+        st.subheader('Datos ingresados por el usuario:')
 
         if uploaded_file is not None:
             st.write(input_df)
         else:
-            st.write('A la espera de que se cargue el archivo csv. Actualmente usando parámetros de entrada de ejemplo (que se muestra a continuación)')
+            st.write('Puede cargar un archivo .csv con la información del usuario o ingresar manualmente los datos en la barra lateral.')
             st.write(input_df)
 
         X_transformed = self.pipeline.transform(input_df)
@@ -52,11 +60,7 @@ class SatisfactionPredictionApp:
             st.subheader('Predicción')
             st.write(prediction)
              #cambio de color el texto de Prediccion
-            if prediction == 'neutral or dissatisfied':
-                st.markdown('<h1 style="color:#ff432d">Insatisfecho</h1>', unsafe_allow_html = True)
-            else:
-                st.markdown('<h1 style="color:#0070B8">Satisfecho</h1>', unsafe_allow_html = True)
-
+        
         with col2:
             st.subheader('Probabilidad de Predicción')
             st.write(prediction_proba)
@@ -65,28 +69,32 @@ class SatisfactionPredictionApp:
                 colorPositivo = '#0070B8'
             else:
                 colorPositivo = '#ff432d'
-            st.bar_chart(prediction_proba, color = ['#DCDCDC', colorPositivo])
+            # st.bar_chart(prediction_proba, color = ['#DCDCDC', colorPositivo])
+
+        if prediction == 'neutral or dissatisfied':
+            st.markdown('<h1 style="color:#ff432d">El cliente está: Insatisfecho</h1>', unsafe_allow_html = True)
+        else:
+            st.markdown('<h1 style="color:#228b22">El cliente está: Satisfecho</h1>', unsafe_allow_html = True)
 
         if st.button('Guardar'):
             self.add_to_database(input_df, prediction[0])
 
-        st.write('')
-        st.write('')
-        st.write('')
-        
         # Tabla de datos pasados obtenidos.
-        st.title('Datos Almacenados')
+        st.title('Datos almacenados')
         data = self.api.obtener_datos()
         df = pd.DataFrame(data)
         st.write(df)
+
 
     def prediction(self, X_transformed):
         prediction = self.model.predict(X_transformed)
         prediction_proba = self.model.predict_proba(X_transformed)
         return prediction, prediction_proba
-    
+
+
     def generate_unique_key(widget_name):
         return f"{widget_name}_{uuid.uuid4()}"
+
 
     def user_input(self):
         #creamos los witgets
@@ -100,9 +108,8 @@ class SatisfactionPredictionApp:
         type_travel = st.sidebar.radio("Type of Travel", ['Personal Travel', 'Business travel'])
         
         st.sidebar.markdown("""Clase""")
-        clas = st.sidebar.radio("Class", ['Eco', 'Eco Plus', 'Business'])
+        clase = st.sidebar.radio("Class", ['Eco', 'Eco Plus', 'Business'])
     
-        st.sidebar.markdown("""...""")
         age = st.sidebar.slider("Age", 0, 99, 25)
         
         flight_distance = st.sidebar.slider("Flight Distance", 0, 9999, 150) # van de 0 9999 y por defecto en 150
@@ -138,3 +145,49 @@ class SatisfactionPredictionApp:
         departure_delay = st.sidebar.slider("Departure Delay in Minutes", 0, 9999, 0)
         
         arrival_delay = st.sidebar.slider("Arrival Delay in Minutes", 0, 9999, 0)
+
+        data_dic = {'unnamed': 8,
+                    'id': 14926,
+                    'gender': gender,
+                    'customer_type': customer_type,
+                    'age': age,
+                    'type_travel': type_travel,
+                    'class': clase,
+                    'flight_distance': flight_distance,
+                    'wifi_service': wifi_service,
+                    'departure_arrival_time': departure_arrival_time,
+                    'online_booking': online_booking,
+                    'gate_location': gate_location,
+                    'food_drink': food_drink,
+                    'online_boarding': online_boarding,
+                    'seat_comfort': seat_comfort,
+                    'entertain': entertain,
+                    'onboard_service': onboard_service,
+                    'leg_service': leg_service,
+                    'bag_handle': bag_handle,
+                    'checkin_service': checkin_service,
+                    'inflight_service': inflight_service,
+                    'cleanliness': cleanliness,
+                    'departure_delay': departure_delay,
+                    'arrival_delay': arrival_delay}
+        
+        index = [0]
+        
+        df = pd.DataFrame(data_dic, index = index)
+        
+        return df
+
+
+    def add_to_database(self, input_df, satisfaction):
+        '''
+        Esta función guarda la información ingresada 
+        en una base de datos SQL junto con la predicción.
+        '''
+        #agrego el orente para que no se almacene el 0, ('Age': {0: 25})
+        input_df_list = input_df.to_dict(orient='records') 
+        #Creo un Nuevo valor
+        nuevo_valor = {'satisfaction': satisfaction}
+        #edito el último elemento de la lista
+        input_df_list[-1].update(nuevo_valor)
+        # envio la lista de diccionarios actualizada
+        self.api.agregar_cliente(input_df_list)

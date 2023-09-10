@@ -13,6 +13,12 @@ from models_metrics.eval_model import model_testing
 
 from models_metrics.eval_model import one_prediction
 
+from app.app_streamlit import SatisfactionPredictionApp
+
+from config.models import ModelDataClients
+
+from config.database import engine
+
 
 if __name__ == "__main__":
     df = load_data('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/functions_methods/airlinedataset.csv')
@@ -21,11 +27,16 @@ if __name__ == "__main__":
     
     X_train, y_train = X_y_separation(df_train, 'satisfaction')
     
-    # #TRANSFORMACIONES SELECCIONADAS!!!
-    # X_transformed3 = third_experiment(X_train, y_train)
+    #TRANSFORMACIONES SELECCIONADAS!!!
+    X_transformed3 = third_experiment(X_train, y_train)
     # test_models(X_transformed3, y_train)
 
-    one_prediction()
+    # one_prediction()
+
+    ModelDataClients.metadata.create_all(bind = engine)
+
+    app = SatisfactionPredictionApp()
+    app.run()
 
     # X_transformed1 = first_experiment(X_train, y_train)
     # test_models(X_transformed1, y_train)

@@ -22,7 +22,7 @@ from config.database import engine
 
 if __name__ == "__main__":
     df = load_data('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/functions_methods/airlinedataset.csv')
-    
+
     df_train = separate_train_set(df, 0.15)
     
     X_train, y_train = X_y_separation(df_train, 'satisfaction')

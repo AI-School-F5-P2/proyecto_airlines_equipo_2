@@ -13,10 +13,12 @@ from functions_methods.custom_transformers import CategoricalDistance
 from sklearn.impute import SimpleImputer
 
 #librerías para codificar variables
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 #función para separar el dataset en X - y
 from functions_methods.utils import X_y_separation
+
+import pickle
 
 
 def experiment(X_train, y_train, cols_to_drop, strategy, drop_onehot, limit_short, limit_medium, add_flight_cat):
@@ -47,9 +49,7 @@ def experiment(X_train, y_train, cols_to_drop, strategy, drop_onehot, limit_shor
    
     #ajustamos el pipeline y transformamos los datos
     X_transformed = full_pipeline.fit_transform(X_train_add)
-    y_transformed = LabelEncoder().fit_transform(y_train)
-    
-    return X_transformed, y_transformed
+    return X_transformed, full_pipeline
 
 def first_experiment(X_train, y_train):
     '''
@@ -64,10 +64,10 @@ def first_experiment(X_train, y_train):
     limit_medium_1 = 3000
     add_flight_cat1 = False
 
-    X_transformed1, y_transformed1 = experiment(X_train, y_train, cols_to_drop_1, strategy_1, 
-                                                drop_onehot_1, limit_short_1, limit_medium_1, 
-                                                add_flight_cat1)
-    return X_transformed1, y_transformed1
+    X_transformed1, full_pipeline = experiment(X_train, y_train, cols_to_drop_1, strategy_1, 
+                                                               drop_onehot_1, limit_short_1, limit_medium_1, 
+                                                               add_flight_cat1)
+    return X_transformed1
 
 def second_experiment(X_train, y_train):
 
@@ -78,10 +78,10 @@ def second_experiment(X_train, y_train):
     limit_medium_2 = 2000
     add_flight_cat2 = False
 
-    X_transformed2, y_transformed2 = experiment(X_train, y_train, cols_to_drop_2, strategy_2,
-                                                drop_onehot_2, limit_short_2, limit_medium_2, 
-                                                add_flight_cat2)
-    return X_transformed2, y_transformed2
+    X_transformed2, full_pipeline = experiment(X_train, y_train, cols_to_drop_2, strategy_2,
+                                                               drop_onehot_2, limit_short_2, limit_medium_2, 
+                                                               add_flight_cat2)
+    return X_transformed2
   
 
 def third_experiment(X_train, y_train):
@@ -93,10 +93,14 @@ def third_experiment(X_train, y_train):
     limit_medium_3 = 2000
     add_flight_cat3 = False
 
-    X_transformed3, y_transformed3 = experiment(X_train, y_train, cols_to_drop_3, strategy_3,
-                                                drop_onehot_3, limit_short_3, limit_medium_3, 
-                                                add_flight_cat3)
-    return X_transformed3, y_transformed3
+    X_transformed3, full_pipeline = experiment(X_train, y_train, cols_to_drop_3, strategy_3,
+                                               drop_onehot_3, limit_short_3, limit_medium_3, 
+                                               add_flight_cat3)
+    
+    with open('pipeline.pkl', 'wb') as archivo:
+        pickle.dump(full_pipeline, archivo)
+    
+    return X_transformed3
   
 def fourth_experiment(X_train, y_train):
 
@@ -107,10 +111,10 @@ def fourth_experiment(X_train, y_train):
     limit_medium_4 = 2000
     add_flight_cat4 = True
 
-    X_transformed4, y_transformed4 = experiment(X_train, y_train, cols_to_drop_4, strategy_4,
-                                                drop_onehot_4, limit_short_4, limit_medium_4, 
-                                                add_flight_cat4)
-    return X_transformed4, y_transformed4
+    X_transformed4, full_pipeline = experiment(X_train, y_train, cols_to_drop_4, strategy_4,
+                                                               drop_onehot_4, limit_short_4, limit_medium_4, 
+                                                               add_flight_cat4)
+    return X_transformed4
 
 def fifth_experiment(X_train, y_train):
 
@@ -127,10 +131,10 @@ def fifth_experiment(X_train, y_train):
     limit_medium_5 = 2000
     add_flight_cat5 = True
 
-    X_transformed5, y_transformed5 = experiment(X_train, y_train, cols_to_drop_5, strategy_5,
-                                                drop_onehot_5, limit_short_5, limit_medium_5, 
-                                                add_flight_cat5)
-    return X_transformed5, y_transformed5
+    X_transformed5, full_pipeline = experiment(X_train, y_train, cols_to_drop_5, strategy_5,
+                                                               drop_onehot_5, limit_short_5, limit_medium_5, 
+                                                               add_flight_cat5)
+    return X_transformed5
   
 def sixth_experiment(X_train, y_train):
 
@@ -148,10 +152,10 @@ def sixth_experiment(X_train, y_train):
     limit_medium_6 = 2000
     add_flight_cat6 = True
 
-    X_transformed6, y_transformed6 = experiment(X_train, y_train, cols_to_drop_6, strategy_6,
-                                                drop_onehot_6, limit_short_6, limit_medium_6, 
-                                                add_flight_cat6)
-    return X_transformed6, y_transformed6
+    X_transformed6, full_pipeline = experiment(X_train, y_train, cols_to_drop_6, strategy_6,
+                                                               drop_onehot_6, limit_short_6, limit_medium_6, 
+                                                               add_flight_cat6)
+    return X_transformed6
 
 def seventh_experiment(X_train, y_train):
 
@@ -162,7 +166,7 @@ def seventh_experiment(X_train, y_train):
     limit_medium_7 = 3000
     add_flight_cat7 = True
 
-    X_transformed7, y_transformed7 = experiment(X_train, y_train, cols_to_drop_7, strategy_7,
-                                                drop_onehot_7, limit_short_7, limit_medium_7, 
-                                                add_flight_cat7)
-    return X_transformed7, y_transformed7
+    X_transformed7, full_pipeline = experiment(X_train, y_train, cols_to_drop_7, strategy_7,
+                                                               drop_onehot_7, limit_short_7, limit_medium_7, 
+                                                               add_flight_cat7)
+    return X_transformed7

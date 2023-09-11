@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-def load_data():
+def load_data(path_to_data):
     '''
     Lee los datos de un archivo csv y modifica los nombres de las columnas
     para usarlas más fácilmente.
@@ -18,7 +18,7 @@ def load_data():
                      'Customer Type': 'customer_type',
                      'Age': 'age',
                      'Type of Travel': 'type_travel',
-                     'Class': 'class',
+                     'Class': 'clase',
                      'Flight Distance': 'flight_distance',
                      'Inflight wifi service': 'wifi_service',
                      'Departure/Arrival time convenient': 'departure_arrival_time',
@@ -42,8 +42,7 @@ def load_data():
         name_cols = list(name_cols.values())
 
         #creación del dataframe
-        df = pd.read_csv('airline_passenger_satisfaction.csv', 
-                         header = 0, names = name_cols)
+        df = pd.read_csv(path_to_data, header = 0, names = name_cols)
         return df
     
     except FileNotFoundError:

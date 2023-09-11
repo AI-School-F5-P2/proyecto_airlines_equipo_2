@@ -1,5 +1,5 @@
 #importación modelo y métodos tuning
-from catboost import CatBoostClassifier, Pool, cv
+from catboost import CatBoostClassifier, Pool
 
 import pickle
 

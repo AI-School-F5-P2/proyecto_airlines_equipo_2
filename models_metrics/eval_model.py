@@ -1,57 +1,99 @@
-#librería para hacer pipeline
-from sklearn.pipeline import Pipeline
-
-#importamos el módulo creado y las librerías para transformar el dataset 
-from sklearn.compose import ColumnTransformer
-from functions_methods.custom_transformers import CategoricalDistance 
-
-#librerías para imputar nulos
-from sklearn.impute import SimpleImputer
-
-#librerías para codificar variables
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder, MinMaxScaler
+import pandas as pd
 
 #función para separar el dataset en X - y
 from functions_methods.utils import load_data, X_y_separation
 
-df = load_data()
+from models_metrics.MLmodels import test
 
-X_train, y_train = X_y_separation(df, 'satisfaction')
+import pickle
 
-def transform_data(X, y_true):
 
-    cols_to_drop = ['unnamed', 'id', 'arrival_delay', 'departure_delay', 'gender', 'departure_arrival_time']
-    strategy = 'median'
-    drop_onehot = 'first'
-    limit_short = 1300
-    limit_medium = 2000
-    add_flight_cat = False
+def model_testing():
+    '''
+    Esta función toma el archivo test.csv que se separó al principio,
+    le aplica la transformación (pipeline) a la matrix X, predice la y con el modelo
+    y luego evalúa las métricas con la función test()
+    '''
+    test_file = load_data('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/test.csv')
 
-    #creamos la nueva columna de distancia de vuelo categórica según el booleano add_flight_cat
-    if add_flight_cat:
-        data_to_predict = CategoricalDistance(limit_short = limit_short, limit_medium = limit_medium).transform(X)
-    else:
-        data_to_predict = X
+    X_test, y_test = X_y_separation(test_file, 'satisfaction')
+
+    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+        pipeline = pickle.load(archivo)
     
-    #creamos un pipeline con los transformadores
-    X_numeric = data_to_predict.select_dtypes(include = ['number'])
-    num_columns = list(X_numeric)
-
-    X_categorical = data_to_predict.select_dtypes(include = ['object'])
-    cat_columns = list(X_categorical)
-
-    num_pipeline = Pipeline([('imputer', SimpleImputer(strategy = strategy)),
-                             ('minmaxscaler', MinMaxScaler())])
-
-    full_pipeline = ColumnTransformer([('drop_col', 'drop', cols_to_drop),
-                                       ('num', num_pipeline, num_columns),
-                                       ('cat', OneHotEncoder(drop = drop_onehot), cat_columns)],
-                                       remainder = 'passthrough')
-   
-    #ajustamos el pipeline y transformamos los datos
-    X_transformed = full_pipeline.fit_transform(data_to_predict)
-    y_transformed = LabelEncoder().fit_transform(y_true)
+    X_test_transformed = pipeline.transform(X_test)
     
-    return X_transformed, y_transformed
+    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+        model = pickle.load(archivo)
+        
+    y_predicted = model.predict(X_test_transformed)
+
+    test(y_predicted, y_test)
 
 
+def load_data_to_predict(path_to_data):
+    '''
+    Lee los datos de un archivo csv y modifica los nombres de las columnas
+    para usarlas más fácilmente.
+    '''
+    try:
+        #reescribo el nombre de las columnas para poder acceder a ellas más fácilmente
+        name_cols = {'Unnamed': 'unnamed',
+                     'id': 'id',
+                     'Gender': 'gender',
+                     'Customer Type': 'customer_type',
+                     'Age': 'age',
+                     'Type of Travel': 'type_travel',
+                     'Class': 'clase',
+                     'Flight Distance': 'flight_distance',
+                     'Inflight wifi service': 'wifi_service',
+                     'Departure/Arrival time convenient': 'departure_arrival_time',
+                     'Ease of Online booking': 'online_booking',
+                     'Gate location': 'gate_location',
+                     'Food and drink': 'food_drink',
+                     'Online boarding': 'online_boarding',
+                     'Seat comfort': 'seat_comfort',
+                     'Inflight entertainment': 'entertain',
+                     'On-board service': 'onboard_service',
+                     'Leg room service': 'leg_service',
+                     'Baggage handling': 'bag_handle',
+                     'Checkin service': 'checkin_service',
+                     'Inflight service': 'inflight_service',
+                     'Cleanliness': 'cleanliness',
+                     'Departure Delay in Minutes': 'departure_delay',
+                     'Arrival Delay in Minutes': 'arrival_delay'}
+
+        #formato lista para poder pasarlas como parámetro names
+        name_cols = list(name_cols.values())
+
+        #creación del dataframe
+        df = pd.read_csv(path_to_data, header = 0, names = name_cols)
+        return df
+    
+    except FileNotFoundError:
+        print(f"El archivo no se encontró.")
+        return None
+    
+    except Exception as e:
+        print(f"Error al cargar el archivo CSV: {str(e)}")
+        return None
+
+
+def one_prediction():
+    '''
+    Esta función recibe un sólo registro de la matriz X.
+    Predice con el modelo y devuelve 'satisfied' o 'neutral or dissatisfied'
+    '''
+    X_to_predict = load_data_to_predict('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/one_register.csv')
+    
+    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+        pipeline = pickle.load(archivo)
+    
+    X_transformed = pipeline.transform(X_to_predict)
+    
+    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+        model = pickle.load(archivo)
+        
+    y_predicted = model.predict(X_transformed)
+
+    print(y_predicted)

@@ -1,6 +1,7 @@
 #librería de tratamiento de datos
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 #importación de métricas de modelos de clasificación
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, f1_score, roc_curve, auc
@@ -53,6 +54,7 @@ def test(y_predicted, y_true, y_probs):
     print("Curva ROC-AUC:")
     plot_roc_curve(y_true, y_probs)
 
+
 def plot_roc_curve(y_true, y_probs):
     fpr, tpr, _ = roc_curve(y_true, y_probs, pos_label = 'satisfied')
     roc_auc = auc(fpr, tpr)
@@ -90,7 +92,7 @@ def train_predict_test_cross(model, data_to_predict, y_true):
     # cross_validation(model, data_to_predict, y_true)
 
 
-def test_models(X_transformed, y_transformed):
+def test_models(X_transformed, y_transformed, X_train):
     '''
     Testea 4 modelos de ensamble que podrían funcionar
     '''
@@ -112,3 +114,8 @@ def test_models(X_transformed, y_transformed):
     cat_boost_tuned = CatBoostClassifier(**best_params)
     train_predict_test_cross(cat_boost_tuned, X_transformed, y_transformed)
 
+    importances = cat_boost_tuned.feature_importances_
+    names = cat_boost_tuned.feature_names_
+    plt.figure(figsize = (20,15))
+    plot = sns.barplot(x = names, y = importances)
+    plt.xticks(rotation = 90);

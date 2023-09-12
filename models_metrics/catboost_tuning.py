@@ -36,3 +36,6 @@ def model_tuning(X_transformed, y_transformed):
     final_cat_boost = 'catboost_airplanes.pkl'
     with open(final_cat_boost, 'wb') as archivo:
         pickle.dump(final_model, archivo)
+
+    feature_importance = final_model.get_feature_importance(data = train_pool, prettified = True)
+    print(feature_importance)

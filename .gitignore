@@ -2,3 +2,11 @@
 env/
 .ipynb_checkpoints
 .env
+app/__pycache__/
+catboost_airplanes.pkl
+catboost_info/
+config/__pycache__/
+experimental_pipelines/__pycache__/
+functions_methods/__pycache__/
+models_metrics/__pycache__/
+pipeline.pkl

@@ -51,13 +51,10 @@ class MySQLAPI:
 
 
 
-
-
-
     # Ruta para obtener todos los clientes de la base de datos
     def obtener_datos(self):
         cursor = self.db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM passenger_airlines")  # Reemplaza 'tu_tabla' con el nombre de tu tabla
+        cursor.execute("SELECT * FROM clients_satisfaction")  # Reemplaza 'tu_tabla' con el nombre de tu tabla
         datos = cursor.fetchall()
         cursor.close()
         return datos

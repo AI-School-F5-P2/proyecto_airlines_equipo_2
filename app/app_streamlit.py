@@ -110,16 +110,12 @@ class SatisfactionPredictionApp:
 
         with st.sidebar.form(key='form1', clear_on_submit=True):
         
-            st.sidebar.markdown("""Género""")
             gender = st.radio("Gender", ['Female', 'Male'])
             
-            st.sidebar.markdown("""Tipo de cliente""")
             customer_type = st.radio("Customer Type" , ['Loyal Customer', 'disloyal Customer'])
             
-            st.sidebar.markdown("""Tipo de viaje""")
             type_travel = st.radio("Type of Travel", ['Personal Travel', 'Business travel'])
             
-            st.sidebar.markdown("""Clase""")
             clase = st.radio("Class", ['Eco', 'Eco Plus', 'Business'])
         
             age = st.slider("Age", 0, 99, 25)

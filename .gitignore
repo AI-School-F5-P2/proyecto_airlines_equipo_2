@@ -7,3 +7,4 @@ heart2.pkl
 .env
 vinary_models/
 catboost_airplanes.pkl
+test.csv

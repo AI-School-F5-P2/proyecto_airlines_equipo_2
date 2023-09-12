@@ -30,3 +30,7 @@ class ModelDataClients(Base):
     departure_delay = Column(Integer)
     arrival_delay = Column(Float)
     satisfaction = Column(String(50))
+
+    def __str__(self):
+        # Define la representación de cadena personalizada para tu objeto
+        return f"Nombre: {self.nombre}, Apellido: {self.apellido}, Edad: {self.edad}"

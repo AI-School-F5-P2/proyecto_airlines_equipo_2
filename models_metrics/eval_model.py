@@ -84,14 +84,14 @@ def one_prediction():
     Esta función recibe un sólo registro de la matriz X.
     Predice con el modelo y devuelve 'satisfied' o 'neutral or dissatisfied'
     '''
-    X_to_predict = load_data_to_predict('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/one_register.csv')
+    X_to_predict = load_data_to_predict('one_register.csv')
     
-    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+    with open('pipeline.pkl', 'rb') as archivo:
         pipeline = pickle.load(archivo)
     
     X_transformed = pipeline.transform(X_to_predict)
     
-    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+    with open('catboost_airplanes.pkl', 'rb') as archivo:
         model = pickle.load(archivo)
         
     y_predicted = model.predict(X_transformed)

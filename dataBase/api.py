@@ -1,80 +1,52 @@
 import mysql.connector
 import numpy as np
 from decouple import config
+from config.models import ModelDataClients
 from dataBase.columns_order import Columns_order_class
+from config.database import Session
 
 class MySQLAPI:
     def __init__(self):
-        # Configura la conexión a la base de datos MySQL
-        self.db = mysql.connector.connect(
-            host= config('LOCALDHOST'),
-            user = config('USER'),
-            password = config('PASSWOR'),
-            database= config('DATABASE'),
-        )
-        
-        self.columns_order = Columns_order_class().columns_order()
-    
+        self.db_session = Session()
+
     def agregar_cliente(self, data):
-        # Crear una lista con los nombres de las columnas en el orden correcto
-        self.columns_order += ['satisfaction'] #agrego un nuevo valor al array
-        
-        # Crear una lista de valores ordenados de acuerdo a column_order
-        values = [data[0][col] for col in self.columns_order]
-        
-        # Convertir valores de tipo numpy.int64 a int
-        values = [int(val) if isinstance(val, np.int64) else val for val in values]
-        
-        # Definir la consulta SQL con marcadores de posición
-        sql_insert = """
-            INSERT INTO passenger_airlines (
-                Age, `Flight Distance`, `Inflight wifi service`, `Departure/Arrival time convenient`,
-                `Ease of Online booking`, `Gate location`, `Food and drink`, `Online boarding`, `Seat comfort`,
-                `Inflight entertainment`, `On-board service`, `Leg room service`, `Baggage handling`, `Checkin service`,
-                `Inflight service`, `Cleanliness`, `Departure Delay in Minutes`, `Arrival Delay in Minutes`,
-                `Gender_Female`, `Gender_Male`, `Customer Type_Loyal Customer`, `Customer Type_disloyal Customer`,
-                `Type of Travel_Business travel`, `Type of Travel_Personal Travel`, `Class_Business`, `Class_Eco`,
-                `Class_Eco Plus`, `satisfaction`
-            ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-            )
-        """
-        
-        # Ejecutar la consulta SQL
-        cursor = self.db.cursor()
-        cursor.execute(sql_insert, tuple(values))
-        self.db.commit()
-
-        return {"mensaje": "Cliente agregado correctamente"}
+        try:
+            # Insertamos los registros en la base de datos
+            new_data = ModelDataClients(**data)
+            self.db_session.add(new_data)
+            # Confirmamos la acción realizada en la base de datos
+            self.db_session.commit()
+            return 'ok'
+        except Exception as e:
+            print(f'Error al almacenar datos en la base de datos: {str(e)}')
+        finally:
+            self.db_session.close()
 
 
 
 
-    # Ruta para obtener todos los clientes de la base de datos
     def obtener_datos(self):
-        cursor = self.db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM clients_satisfaction")  # Reemplaza 'tu_tabla' con el nombre de tu tabla
-        datos = cursor.fetchall()
-        cursor.close()
-        return datos
+        try:
+            # Realizo una consulta para obtener todos los clientes
+            datos = self.db_session.query(ModelDataClients).all()
 
-
-
-
-
-
-
-
-
+            # Convierto los objetos ModelDataClients en diccionarios
+            datos_json = [cliente.__dict__ for cliente in datos]
+            
+            # Elimino la clave '_sa_instance_state' de cada diccionario
+            for cliente_json in datos_json:
+                cliente_json.pop('_sa_instance_state', None)
+            
+            return datos_json
+        except Exception as e:
+            print(f'Error al obtener datos de la base de datos: {str(e)}')
+        finally:
+            self.db_session.close()
 
 
 if __name__ == '__main__':
     api = MySQLAPI()
     api.obtener_datos()
-    
-    
-    
-    
-    
+
     
     

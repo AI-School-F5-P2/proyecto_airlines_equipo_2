@@ -3,8 +3,6 @@ import pickle
 import streamlit as st
 import uuid
 from PIL import Image
-# from dataBase.api import MySQLAPI
-# from dataBase.columns_order import Columns_order_class
 
 from models_metrics.eval_model import load_data_to_predict
 

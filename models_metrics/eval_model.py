@@ -28,7 +28,12 @@ def model_testing():
         
     y_predicted = model.predict(X_test_transformed)
 
-    test(y_predicted, y_test)
+    probability = model.predict_proba(X_test_transformed)
+    
+    #tomamos como clase positiva ('satisfied')
+    y_probs = probability[:, model.classes_.tolist().index('satisfied')]
+
+    test(y_predicted, y_test, y_probs)
 
 
 def load_data_to_predict(path_to_data):

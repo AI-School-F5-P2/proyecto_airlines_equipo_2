@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.csv
 env/
 .ipynb_checkpoints
@@ -10,3 +11,14 @@ experimental_pipelines/__pycache__/
 functions_methods/__pycache__/
 models_metrics/__pycache__/
 pipeline.pkl
+=======
+airline_passenger_satisfaction.csv
+ariline2.ipynb
+modelo.ipynb
+__pycache__/
+.ipynb_checkpoints/
+heart2.pkl
+.env
+vinary_models/
+catboost_airplanes.pkl
+>>>>>>> 89dd424b4665f64bd1893a93dc39a9ea51a1778b

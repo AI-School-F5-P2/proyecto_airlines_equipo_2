@@ -16,13 +16,13 @@ class SatisfactionPredictionApp:
     Creación de la app con Streamlit. Para visualizar usar el comando: streamlit run main.py
     '''
     def __init__(self):
-        with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+        with open('pipeline.pkl', 'rb') as archivo:
             self.pipeline = pickle.load(archivo)
         
-        with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+        with open('catboost_airplanes.pkl', 'rb') as archivo:
             self.model = pickle.load(archivo)
         
-        self.logo_path = 'C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/images/airline_logo2.png'
+        self.logo_path = 'images/airline_logo2.png'
 
 
     def run(self):

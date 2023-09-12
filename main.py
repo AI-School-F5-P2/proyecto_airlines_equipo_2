@@ -21,7 +21,7 @@ from config.database import engine
 
 
 if __name__ == "__main__":
-    df = load_data('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/functions_methods/airlinedataset.csv')
+    df = load_data('functions_methods/airline_passenger_satisfaction.csv')
 
     df_train = separate_train_set(df, 0.15)
     

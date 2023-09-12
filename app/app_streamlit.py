@@ -16,13 +16,14 @@ class SatisfactionPredictionApp:
     Creación de la app con Streamlit. Para visualizar usar el comando: streamlit run main.py
     '''
     def __init__(self):
-        with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+        with open('pipeline.pkl', 'rb') as archivo:
             self.pipeline = pickle.load(archivo)
         
-        with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+        with open('catboost_airplanes.pkl', 'rb') as archivo:
             self.model = pickle.load(archivo)
         
-        self.logo_path = 'C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/proyecto_airlines_equipo_2/images/airline_logo2.png'
+        self.logo_path = 'images/airline_logo2.png'
+        self.num = 11
 
 
     def run(self):
@@ -82,6 +83,16 @@ class SatisfactionPredictionApp:
 
         if st.button('Guardar'):
             self.add_to_database(input_df, prediction[0])
+            
+        if st.button("Reiniciar Valor"):
+            self.num = 0
+            self.user_input()
+            
+        # if st.button("Reiniciar"):
+        #     # Restablece los valores de los inputs
+        #     print(self.num)
+        #     self.num = 0
+        #     print(self.num)
 
 
     def prediction(self, X_transformed):
@@ -97,7 +108,7 @@ class SatisfactionPredictionApp:
     def user_input(self):
         #creamos los witgets
         st.sidebar.markdown("""Número de seguimiento (id)""")
-        id = st.sidebar.text_input("id", "00000")
+        # id = st.sidebar.text_input("id", self.num)
 
         st.sidebar.markdown("""Género""")
         gender = st.sidebar.radio("Gender", ['Female', 'Male'])
@@ -148,7 +159,7 @@ class SatisfactionPredictionApp:
         arrival_delay = st.sidebar.slider("Arrival Delay in Minutes", 0, 9999, 0)
 
         data_dic = {'unnamed': 0,
-                    'id': id,
+                    'id': 0,
                     'gender': gender,
                     'customer_type': customer_type,
                     'age': age,
@@ -175,7 +186,7 @@ class SatisfactionPredictionApp:
         index = [0]
         
         df = pd.DataFrame(data_dic, index = index)
-        
+        print(id)
         return df
 
 

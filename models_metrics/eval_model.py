@@ -14,16 +14,16 @@ def model_testing():
     le aplica la transformación (pipeline) a la matrix X, predice la y con el modelo
     y luego evalúa las métricas con la función test()
     '''
-    test_file = load_data('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/test.csv')
+    test_file = load_data('test.csv')
 
     X_test, y_test = X_y_separation(test_file, 'satisfaction')
 
-    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/pipeline.pkl', 'rb') as archivo:
+    with open('pipeline.pkl', 'rb') as archivo:
         pipeline = pickle.load(archivo)
     
     X_test_transformed = pipeline.transform(X_test)
     
-    with open('C:/Users/Ana Milena GOMEZ/Documents/Ana Milena GOMEZ/IA-School_Factoria-F5/F5Airlines/catboost_airplanes.pkl', 'rb') as archivo:
+    with open('catboost_airplanes.pkl', 'rb') as archivo:
         model = pickle.load(archivo)
         
     y_predicted = model.predict(X_test_transformed)

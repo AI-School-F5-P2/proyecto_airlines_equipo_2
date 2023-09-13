@@ -27,7 +27,7 @@ if __name__ == "__main__":
     
     X_train, y_train = X_y_separation(df_train, 'satisfaction')
     
-    # #TRANSFORMACIONES SELECCIONADAS!!!
+     ##TRANSFORMACIONES SELECCIONADAS!!!
     # X_transformed3 = third_experiment(X_train, y_train)
     # test_models(X_transformed3, y_train)
 

@@ -8,9 +8,9 @@ class MySQLAPI:
         # Configura la conexión a la base de datos MySQL
         self.db = mysql.connector.connect(
          
-            host= config('HOST'),
+            host= config('LOCALHOST'),
             user = config('USER'),
-            password = config('PASSWOR'),
+            password = config('PASSWORD'),
             database= config('DATABASE'),
         )
         

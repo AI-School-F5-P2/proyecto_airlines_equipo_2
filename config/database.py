@@ -4,9 +4,9 @@ from sqlalchemy.orm import sessionmaker
 from decouple import config
 
 database = config('DATABASE')
-password = config('PASSWOR')
+password = config('PASSWORD')
 user = config('USER')
-localhost = config('HOST')
+localhost = config('LOCALHOST')
 
 router = f"mysql+pymysql://{user}:{password}@{localhost}:3306/{database}"
 

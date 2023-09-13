@@ -27,6 +27,7 @@ class SatisfactionPredictionApp:
         self.logo_path = 'images/airline_logo2.png'
         self.api = MySQLAPI()
         self.num = 11
+        self.boton:any
 
 
     def run(self):
@@ -86,6 +87,9 @@ class SatisfactionPredictionApp:
 
         if st.button('Guardar'):
             self.add_to_database(input_df, prediction[0])
+            
+
+        
             
             
         data = self.api.obtener_datos()
@@ -158,10 +162,11 @@ class SatisfactionPredictionApp:
             
             arrival_delay = st.slider("Arrival Delay in Minutes", 0, 9999, 0)
         
-            boton = st.form_submit_button(label='Predict')
+            boton = st.form_submit_button(label='Enviar')
             
         if boton:
             st.success('formulario enviado')
+            
 
         data_dic = {'unnamed': 0,
                     'id': 0,

@@ -29,19 +29,19 @@ if __name__ == "__main__":
     
     #TRANSFORMACIONES SELECCIONADAS!!!
     X_transformed3 = third_experiment(X_train, y_train)
-    test_models(X_transformed3, y_train, X_train)
+    # test_models(X_transformed3, y_train, X_train)
 
-    model_tuning(X_transformed3, y_train)
+    # model_tuning(X_transformed3, y_train)
 
     # model_testing()
 
     # one_prediction()
 
-    # ModelDataClients.metadata.create_all(bind = engine)
+    ModelDataClients.metadata.create_all(bind = engine)
 
-    # app = SatisfactionPredictionApp()
+    app = SatisfactionPredictionApp()
     
-    # app.run()
+    app.run()
 
     # X_transformed1 = first_experiment(X_train, y_train)
     # test_models(X_transformed1, y_train)

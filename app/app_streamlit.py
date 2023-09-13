@@ -96,57 +96,57 @@ class SatisfactionPredictionApp:
         #metemos los widgets dentro de un formulario
         with st.sidebar.form(key = 'form1', clear_on_submit = True):
 
-            gender = st.sidebar.radio("Gender", ['Female', 'Male'])
+            gender = st.radio("Gender", ['Female', 'Male'])
             
-            customer_type = st.sidebar.radio("Customer Type" , ['Loyal Customer', 'disloyal Customer'])
+            customer_type = st.radio("Customer Type" , ['Loyal Customer', 'disloyal Customer'])
             
-            type_travel = st.sidebar.radio("Type of Travel", ['Personal Travel', 'Business travel'])
+            type_travel = st.radio("Type of Travel", ['Personal Travel', 'Business travel'])
             
-            clase = st.sidebar.radio("Class", ['Eco', 'Eco Plus', 'Business'])
+            clase = st.radio("Class", ['Eco', 'Eco Plus', 'Business'])
         
-            age = st.sidebar.slider("Age", 0, 99, 25)
+            age = st.slider("Age", 0, 99, 25)
             
-            flight_distance = st.sidebar.slider("Flight Distance", 0, 9999, 150) # van de 0 9999 y por defecto en 150
+            flight_distance = st.slider("Flight Distance", 0, 9999, 150) # van de 0 9999 y por defecto en 150
             
-            wifi_service = st.sidebar.slider("Inflight wifi service", 0, 5, 1)
+            wifi_service = st.slider("Inflight wifi service", 0, 5, 1)
             
-            departure_arrival_time = st.sidebar.slider("Departure/Arrival time", 0, 5, 1)
+            departure_arrival_time = st.slider("Departure/Arrival time", 0, 5, 1)
             
-            online_booking = st.sidebar.slider("Ease of Online booking", 0, 5, 1)
+            online_booking = st.slider("Ease of Online booking", 0, 5, 1)
             
-            gate_location = st.sidebar.slider("Gate location", 0, 5, 1)
+            gate_location = st.slider("Gate location", 0, 5, 1)
             
-            food_drink = st.sidebar.slider("Food and drink", 0, 5, 1)
+            food_drink = st.slider("Food and drink", 0, 5, 1)
             
-            online_boarding = st.sidebar.slider("Online boarding", 0, 5, 1)
+            online_boarding = st.slider("Online boarding", 0, 5, 1)
             
-            seat_comfort = st.sidebar.slider("Seat comfort", 0, 5, 1)
+            seat_comfort = st.slider("Seat comfort", 0, 5, 1)
             
-            entertain = st.sidebar.slider("Inflight entertainment", 0, 5, 1)
+            entertain = st.slider("Inflight entertainment", 0, 5, 1)
             
-            onboard_service = st.sidebar.slider("On-board service", 0, 5, 1)
+            onboard_service = st.slider("On-board service", 0, 5, 1)
             
-            leg_service = st.sidebar.slider("Leg room service", 0, 5, 1)
+            leg_service = st.slider("Leg room service", 0, 5, 1)
             
-            bag_handle = st.sidebar.slider("Baggage handling", 0, 5, 1)
+            bag_handle = st.slider("Baggage handling", 0, 5, 1)
             
-            checkin_service = st.sidebar.slider("Checkin service", 0, 5, 1)
+            checkin_service = st.slider("Checkin service", 0, 5, 1)
             
-            inflight_service = st.sidebar.slider("Inflight service", 0, 5, 1)
+            inflight_service = st.slider("Inflight service", 0, 5, 1)
             
-            cleanliness = st.sidebar.slider("Cleanliness", 0, 5, 1)
+            cleanliness = st.slider("Cleanliness", 0, 5, 1)
             
-            departure_delay = st.sidebar.slider("Departure Delay in Minutes", 0, 9999, 0)
+            departure_delay = st.slider("Departure Delay in Minutes", 0, 9999, 0)
             
-            arrival_delay = st.sidebar.slider("Arrival Delay in Minutes", 0, 9999, 0)
+            arrival_delay = st.slider("Arrival Delay in Minutes", 0, 9999, 0)
 
             boton = st.form_submit_button(label = 'Enviar')
 
             if boton:
-                st.sidebar.success('Formulario Enviado')
+                st.success('Formulario Enviado')
 
             data_dic = {'unnamed': 0,
-                        'id': 123987,
+                        'id': 0,
                         'gender': gender,
                         'customer_type': customer_type,
                         'age': age,

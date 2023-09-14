@@ -27,4 +27,4 @@ INTEGRANTES EQUIPO 2**
 - Maikol Garrido
 - Tania Monteiro
 
-**![Captura de pantalla (116)](https://github.com/AI-School-F5-P2/proyecto_airlines_equipo_2/assets/104582495/57d1d28d-f817-493c-be71-ef5d26ac03a6)
+

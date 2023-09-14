@@ -21,10 +21,14 @@ El proyecto contiene las siguientes carpetas:
 Al crear el pipeline de transformaciones de la data y al entrenar el modelo de IA se crean automáticamente los archivos .pkl que se cargan para tener la app funcional.
 
 
-INTEGRANTES EQUIPO 2**
+INTEGRANTES EQUIPO 2
 - Ana Gomez
 - Carolina Gomez
 - Maikol Garrido
 - Tania Monteiro
 
+
+
+
+**![Captura de pantalla (116)](https://github.com/AI-School-F5-P2/proyecto_airlines_equipo_2/assets/104582495/57d1d28d-f817-493c-be71-ef5d26ac03a6)
 
